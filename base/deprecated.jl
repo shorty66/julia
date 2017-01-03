@@ -1476,7 +1476,7 @@ end
 # Deprecate manually vectorized `big` methods in favor of compact broadcast syntax
 @deprecate big(r::UnitRange) big.(r)
 @deprecate big(r::StepRange) big.(r)
-@deprecate big(r::FloatRange) big.(r)
+@deprecate big(r::StepRangeLen) big.(r)
 @deprecate big(r::LinSpace) big.(r)
 @deprecate big{T<:Integer,N}(x::AbstractArray{T,N}) big.(x)
 @deprecate big{T<:AbstractFloat,N}(x::AbstractArray{T,N}) big.(x)
@@ -1672,6 +1672,6 @@ iteratoreltype(::Type{Task}) = EltypeUnknown()
 
 isempty(::Task) = error("isempty not defined for Tasks")
 
-@deprecate_binding FloatRange StepRangeHiLo
+@deprecate FloatRange{T}(start::T, step, len, den) Base.floatrange(T, start, step, len, den)
 
 # End deprecations scheduled for 0.6

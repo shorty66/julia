@@ -62,7 +62,7 @@ export
     ExponentialBackOff,
     Factorization,
     FileMonitor,
-    StepRangeHiLo,
+    StepRangeLen,
     Future,
     Hermitian,
     UniformScaling,
