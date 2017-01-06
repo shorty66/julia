@@ -389,10 +389,8 @@ static Function *expect_func;
 static Function *jldlsym_func;
 static Function *jlnewbits_func;
 static Function *jltypeassert_func;
-#if JL_LLVM_VERSION < 30600
 static Function *jlpow_func;
 static Function *jlpowf_func;
-#endif
 //static Function *jlgetnthfield_func;
 static Function *jlgetnthfieldchecked_func;
 //static Function *jlsetnthfield_func;
@@ -5946,7 +5944,6 @@ static void init_julia_llvm_env(Module *m)
                          "jl_gc_diff_total_bytes", m);
     add_named_global(diff_gc_total_bytes_func, *jl_gc_diff_total_bytes);
 
-#if JL_LLVM_VERSION < 30600
     Type *powf_type[2] = { T_float32, T_float32 };
     jlpowf_func = Function::Create(FunctionType::get(T_float32, powf_type, false),
                                    Function::ExternalLinkage,
@@ -5964,7 +5961,7 @@ static void init_julia_llvm_env(Module *m)
         &pow,
 #endif
         false);
-#endif
+
     std::vector<Type*> array_owner_args(0);
     array_owner_args.push_back(T_pjlvalue);
     jlarray_data_owner_func =

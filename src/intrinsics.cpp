@@ -1452,23 +1452,14 @@ static Value *emit_untyped_intrinsic(intrinsic f, Value *x, Value *y, Value *z, 
                                                             ArrayRef<Type*>(x->getType())),
                                   x);
     }
-    case powi_llvm: {
+    case powf_llvm: {
         x = FP(x);
-        y = JL_INT(y);
-        Type *tx = x->getType(); // TODO: LLVM expects this to be i32
-#if JL_LLVM_VERSION >= 30600
-        Type *ts[1] = { tx };
-        Value *powi = Intrinsic::getDeclaration(jl_Module, Intrinsic::powi,
-            ArrayRef<Type*>(ts));
+        y = FP(y);
+        Function *powf = (x->getType() == T_float64 ? jlpow_func : jlpowf_func);
 #if JL_LLVM_VERSION >= 30700
-        return builder.CreateCall(powi, {x, y});
+        return builder.CreateCall(prepare_call(powf), {x, y});
 #else
-        return builder.CreateCall2(powi, x, y);
-#endif
-#else
-        // issue #6506
-        return builder.CreateCall2(prepare_call(tx == T_float64 ? jlpow_func : jlpowf_func),
-                x, builder.CreateSIToFP(y, tx));
+        return builder.CreateCall2(prepare_call(powf), x, y);
 #endif
     }
     case sqrt_llvm_fast: {

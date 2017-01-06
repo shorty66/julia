@@ -947,6 +947,8 @@ bi_iintrinsic_fast(jl_LLVMFlipSign, flipsign, flipsign_int,  )
         *pr = fp_select(a, sqrt)
 #define copysign_float(a, b) \
         fp_select2(a, b, copysign)
+#define pow_float(a, b) \
+        fp_select2(a, b, pow)
 
 un_fintrinsic(abs_float,abs_float)
 bi_fintrinsic(copysign_float,copysign_float)
@@ -955,31 +957,7 @@ un_fintrinsic(floor_float,floor_llvm)
 un_fintrinsic(trunc_float,trunc_llvm)
 un_fintrinsic(rint_float,rint_llvm)
 un_fintrinsic(sqrt_float,sqrt_llvm)
-
-JL_DLLEXPORT jl_value_t *jl_powi_llvm(jl_value_t *a, jl_value_t *b)
-{
-    jl_ptls_t ptls = jl_get_ptls_states();
-    jl_value_t *ty = jl_typeof(a);
-    if (!jl_is_bitstype(ty))
-        jl_error("powi_llvm: a is not a bitstype");
-    if (!jl_is_bitstype(jl_typeof(b)) || jl_datatype_size(jl_typeof(b)) != 4)
-        jl_error("powi_llvm: b is not a 32-bit bitstype");
-    int sz = jl_datatype_size(ty);
-    jl_value_t *newv = jl_gc_alloc(ptls, sz, ty);
-    void *pa = jl_data_ptr(a), *pr = jl_data_ptr(newv);
-    switch (sz) {
-    /* choose the right size c-type operation */
-    case 4:
-        *(float*)pr = powf(*(float*)pa, (float)jl_unbox_int32(b));
-        break;
-    case 8:
-        *(double*)pr = pow(*(double*)pa, (double)jl_unbox_int32(b));
-        break;
-    default:
-        jl_error("powi_llvm: runtime floating point intrinsics are not implemented for bit sizes other than 32 and 64");
-    }
-    return newv;
-}
+bi_fintrinsic(pow_float,powf_llvm)
 
 JL_DLLEXPORT jl_value_t *jl_select_value(jl_value_t *isfalse, jl_value_t *a, jl_value_t *b)
 {

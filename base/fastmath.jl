@@ -23,7 +23,7 @@ module FastMath
 
 export @fastmath
 
-import Core.Intrinsics: box, unbox, powi_llvm, sqrt_llvm_fast
+import Core.Intrinsics: box, unbox, powf_llvm, sqrt_llvm_fast
 
 const fast_op =
     Dict(# basic arithmetic
@@ -250,9 +250,9 @@ end
 
 # builtins
 
-pow_fast{T<:FloatTypes}(x::T, y::Integer) = pow_fast(x, Int32(y))
-pow_fast{T<:FloatTypes}(x::T, y::Int32) =
-    box(T, Base.powi_llvm(unbox(T,x), unbox(Int32,y)))
+pow_fast{T<:FloatTypes}(x::T, y::Integer) = pow_fast(x, convert(T, y))
+pow_fast{T<:FloatTypes}(x::T, y::T) =
+    box(T, Base.powf_llvm(unbox(T,x), unbox(T,y)))
 
 # TODO: Change sqrt_llvm intrinsic to avoid nan checking; add nan
 # checking to sqrt in math.jl; remove sqrt_llvm_fast intrinsic
