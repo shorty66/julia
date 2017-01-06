@@ -61,11 +61,10 @@ let t = Dates.Period[Dates.Week(2), Dates.Day(14), Dates.Hour(14*24), Dates.Minu
         Pi = typeof(t[i])
         for j = 1:length(t)
             @test t[i] == t[j]
-            @test Int(convert(Pi,t[j])) == Int(t[i])
         end
         for j = i+1:length(t)
             Pj = typeof(t[j])
-            tj1 = t[j] + one(Pj)
+            tj1 = t[j] + Pj(1)
             @test t[i] < tj1
             @test_throws InexactError Pi(tj1)
             @test_throws InexactError Pj(Pi(typemax(Int64)))
@@ -74,8 +73,7 @@ let t = Dates.Period[Dates.Week(2), Dates.Day(14), Dates.Hour(14*24), Dates.Minu
     end
 end
 @test Dates.Year(3) == Dates.Month(36)
-@test Int(convert(Dates.Month, Dates.Year(3))) == 36
-@test Int(convert(Dates.Year, Dates.Month(36))) == 3
+@test_throws ErrorException Int(Dates.Month(36))  # eventually change to MethodError
 @test Dates.Year(3) < Dates.Month(37)
 @test_throws InexactError convert(Dates.Year, Dates.Month(37))
 @test_throws InexactError Dates.Month(Dates.Year(typemax(Int64)))
@@ -103,4 +101,3 @@ b = Dates.Date(2000)
 @test convert(Date,730120) == b
 @test convert(Date,730120.0) == b
 @test convert(Date,Int32(730120)) == b
-

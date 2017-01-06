@@ -1499,4 +1499,8 @@ end
 # Calling promote_op is likely a bad idea, so deprecate its convenience wrapper promote_eltype_op
 @deprecate promote_eltype_op(op, As...) promote_op(op, map(eltype, As)...)
 
+# These conversions should not be defined, see #19896
+Base.convert{T<:Number}(::Type{T},x::Dates.Period) = error("conversion between Periods and Numbers is not defined")
+Base.convert{T<:Dates.Period}(::Type{T},x::Real) = error("conversion between Periods and Numbers is not defined")
+
 # End deprecations scheduled for 0.6
