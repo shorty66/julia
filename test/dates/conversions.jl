@@ -90,14 +90,10 @@ end
 # Conversions to/from numbers
 a = Dates.DateTime(2000)
 b = Dates.Date(2000)
-@test convert(Real,b) == 730120
-@test convert(Float64,b) == 730120.0
-@test convert(Int32,b) == 730120
-@test convert(Real,a) == 63082368000000
-@test convert(Float64,a) == 63082368000000.0
-@test convert(Int64,a) == 63082368000000
-@test convert(DateTime,63082368000000) == a
-@test convert(DateTime,63082368000000.0) == a
-@test convert(Date,730120) == b
-@test convert(Date,730120.0) == b
-@test convert(Date,Int32(730120)) == b
+@test Dates.datetime2rata(b) == 730120
+@test Dates.datetime2rata(a) == 63082368000000
+@test Dates.rata2datetime(63082368000000) == a
+@test Dates.rata2datetime(63082368000000.0) == a
+@test Dates.rata2datetime(730120) == b
+@test Dates.rata2datetime(730120.0) == b
+@test Dates.rata2datetime(Int32(730120)) == b

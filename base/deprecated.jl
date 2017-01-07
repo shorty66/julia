@@ -1502,5 +1502,9 @@ end
 # These conversions should not be defined, see #19896
 Base.convert{T<:Number}(::Type{T},x::Dates.Period) = error("conversion between Periods and Numbers is not defined")
 Base.convert{T<:Dates.Period}(::Type{T},x::Real) = error("conversion between Periods and Numbers is not defined")
+@deprecate convert{R<:Real}(::Type{R},x::Dates.DateTime) R(Dates.datetime2rata(x))
+@deprecate convert{R<:Real}(::Type{R},x::Dates.Date)     R(Dates.datetime2rata(x))
+@deprecate convert(::Type{Dates.DateTime}, x::Real) Dates.rata2datetime(x)
+@deprecate convert(::Type{Dates.Date}, x::Real)     Dates.Date(Dates.rata2datetime(x))
 
 # End deprecations scheduled for 0.6

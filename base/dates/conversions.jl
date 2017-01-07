@@ -21,30 +21,6 @@ DateTime(dt::TimeType) = convert(DateTime,dt)
 
 Base.convert(::Type{DateTime},dt::Date) = DateTime(UTM(value(dt)*86400000))
 Base.convert(::Type{Date},dt::DateTime) = Date(UTD(days(dt)))
-"""
-    convert{T<:Real}(::Type{T}, dt::DateTime) -> T
-Converts a DateTime value `dt` to a number of type `T`. The returned value corresponds to the number of Rata Die milliseconds since epoch.
-See `convert(DateTime, x::Real)` for inverse.
-"""
-Base.convert{R<:Real}(::Type{R},x::DateTime) = convert(R,value(x))
-"""
-    convert{T<:Real}(::Type{T}, dt::Date) -> T
-Converts a Date value `dt` to a number of type `T`. The returned value corresponds to the number of Rata Die days since epoch.
-See `convert(Date, x::Real)` for inverse.
-"""
-Base.convert{R<:Real}(::Type{R},x::Date)     = convert(R,value(x))
-"""
-    convert{T<:Real}(::Type{DateTime}, x::T) -> DateTime
-Converts a number of type `T` to a DateTime. `x` should be the number of Rata Die milliseconds since epoch.
-See `convert(Int64,dt::DateTime)` for inverse.
-"""
-Base.convert{R<:Real}(::Type{DateTime}, x::R) = DateTime(UTM(x))
-"""
-    convert{T<:Real}(::Type{Date}, x::T) -> Date
-Converts a number of type `T` to a Date. `x` should be the number of Rata Die days since epoch.
-See `convert(Int64,dt::Date)` for inverse.
-"""
-Base.convert{R<:Real}(::Type{Date}, x::R) = Date(UTD(x))
 
 ### External Conversions
 const UNIXEPOCH = value(DateTime(1970)) #Rata Die milliseconds for 1970-01-01T00:00:00
