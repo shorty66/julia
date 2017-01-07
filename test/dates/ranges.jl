@@ -482,10 +482,10 @@ function testmonthranges2(n)
 end
 testmonthranges2(100000)
 
-@test length(Dates.Year(1):Dates.Year(10)) == 10
+@test length(Dates.Year(1):Dates.Year(1):Dates.Year(10)) == 10
 @test length(Dates.Year(10):Dates.Year(-1):Dates.Year(1)) == 10
 @test length(Dates.Year(10):Dates.Year(-2):Dates.Year(1)) == 5
-@test_throws OverflowError length(typemin(Dates.Year):typemax(Dates.Year))
+@test_throws OverflowError length(typemin(Dates.Year):Dates.Year(1):typemax(Dates.Year))
 @test_throws MethodError Dates.Date(0):Dates.DateTime(2000)
 @test_throws MethodError Dates.Date(0):Dates.Year(10)
 @test length(range(Dates.Date(2000),366)) == 366
