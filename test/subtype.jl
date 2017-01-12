@@ -782,6 +782,11 @@ function test_intersection()
 
     @testintersect(DataType, Type, DataType)
     @testintersect(DataType, Type{T} where T<:Integer, Type{T} where T<:Integer)
+    @testintersect(Union{DataType,Int}, Type, DataType)
+    @testintersect(Union{DataType,Int}, Type{T} where T, DataType)
+    # test typeintersect wrapper as well as _type_intersect
+    @test typeintersect(Union{DataType,Int}, Type) === DataType
+    @test typeintersect(Union{DataType,Int}, Type{T} where T) === DataType
 
     @testintersect((Type{Tuple{Vararg{T}}} where T), Type{Tuple}, Bottom)
     @testintersect(Tuple{Type{S}, Tuple{Any, Vararg{Any}}} where S<:Tuple{Any, Vararg{Any}},
