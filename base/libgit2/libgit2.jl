@@ -461,6 +461,7 @@ end
 
 Attempt an automatic merge rebase of the current branch, from `upstream` if provided, or
 otherwise from the upstream tracking branch.
+`newbase` is the branch to rebase onto, or `NULL` to rebase onto the given `upstream`.
 
 If any conflicts arise which cannot be automatically resolved, the rebase will abort,
 leaving the repository and working tree in its original state, and the function will throw
