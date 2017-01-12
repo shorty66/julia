@@ -610,3 +610,21 @@ end
 @generated f18883() = nothing
 @test !isempty(sprint(io->code_llvm(io, f18883, Tuple{})))
 @test !isempty(sprint(io->code_native(io, f18883, Tuple{})))
+
+# New reflection methods in 0.6
+immutable ReflectionExample{T<:AbstractFloat, N}
+    x::Tuple{T, N}
+end
+
+@test Base.isabstract(AbstractArray)
+@test !Base.isabstract(ReflectionExample)
+@test !Base.isabstract(Int)
+
+@test Base.parameter_upper_bound(ReflectionExample, 1) === AbstractFloat
+@test Base.parameter_upper_bound(ReflectionExample, 2) === Any
+@test Base.parameter_upper_bound(ReflectionExample{T, N} where T where N <: Real, 2) === Real
+
+@test Base.unparameterized_type(ReflectionExample{Float64, Int64}) === ReflectionExample
+@test Base.unparameterized_type(ReflectionExample{Float64, N} where N) === ReflectionExample
+@test Base.unparameterized_type(ReflectionExample{T, Int64} where T) === ReflectionExample
+@test Base.unparameterized_type(ReflectionExample) === ReflectionExample
