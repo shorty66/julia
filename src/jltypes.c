@@ -2221,10 +2221,10 @@ void jl_init_types(void)
                                                           tttvar, (jl_value_t*)jl_wrap_Type((jl_value_t*)tttvar));
 
     // Type{T}
-    jl_typetype_tvar = tvar("T");
+    jl_tvar_t *typetype_tvar = tvar("T");
     jl_typetype_type =
-        (jl_unionall_t*)jl_new_struct(jl_unionall_type, jl_typetype_tvar,
-                                      jl_apply_type1((jl_value_t*)jl_type_type, (jl_value_t*)jl_typetype_tvar));
+        (jl_unionall_t*)jl_new_struct(jl_unionall_type, typetype_tvar,
+                                      jl_apply_type1((jl_value_t*)jl_type_type, (jl_value_t*)typetype_tvar));
 
     jl_ANY_flag = (jl_value_t*)tvar("ANY");
 

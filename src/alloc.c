@@ -17,7 +17,6 @@ extern "C" {
 JL_DLLEXPORT jl_value_t *jl_true;
 JL_DLLEXPORT jl_value_t *jl_false;
 
-jl_tvar_t     *jl_typetype_tvar;
 jl_unionall_t *jl_typetype_type;
 jl_value_t    *jl_ANY_flag;
 

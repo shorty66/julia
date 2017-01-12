@@ -481,7 +481,6 @@ extern JL_DLLEXPORT jl_datatype_t *jl_tvar_type;
 
 extern JL_DLLEXPORT jl_datatype_t *jl_any_type;
 extern JL_DLLEXPORT jl_unionall_t *jl_type_type;
-extern JL_DLLEXPORT jl_tvar_t     *jl_typetype_tvar;
 extern JL_DLLEXPORT jl_unionall_t *jl_typetype_type;
 extern JL_DLLEXPORT jl_value_t    *jl_ANY_flag;
 extern JL_DLLEXPORT jl_datatype_t *jl_typename_type;

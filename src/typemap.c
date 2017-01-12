@@ -47,16 +47,15 @@ static int sig_match_by_type_simple(jl_value_t **types, size_t n, jl_tupletype_t
     for (i = 0; i < lensig; i++) {
         jl_value_t *decl = jl_field_type(sig, i);
         jl_value_t *a = types[i];
-        if (jl_is_type_type(decl)) {
-            jl_value_t *tp0 = jl_tparam0(decl);
+        jl_value_t *unw = jl_is_unionall(decl) ? ((jl_unionall_t*)decl)->body : decl;
+        if (jl_is_type_type(unw)) {
+            jl_value_t *tp0 = jl_tparam0(unw);
             if (jl_is_type_type(a)) {
-                if (tp0 == (jl_value_t*)jl_typetype_tvar) {
-                    // in the case of Type{T}, the types don't have
-                    // to match exactly either. this is cached as Type{T}.
-                    // analogous to the situation with tuples.
-                }
-                else if (jl_is_typevar(tp0)) {
-                    if (!jl_subtype(jl_tparam0(a), ((jl_tvar_t*)tp0)->ub))
+                if (jl_is_typevar(tp0)) {
+                    // in the case of Type{_}, the types don't have to match exactly.
+                    // this is cached as `Type{T} where T`.
+                    if (((jl_tvar_t*)tp0)->ub != (jl_value_t*)jl_any_type &&
+                        !jl_subtype(jl_tparam0(a), ((jl_tvar_t*)tp0)->ub))
                         return 0;
                 }
                 else {
@@ -135,13 +134,11 @@ static inline int sig_match_simple(jl_value_t **args, size_t n, jl_value_t **sig
         jl_value_t *unw = jl_is_unionall(decl) ? ((jl_unionall_t*)decl)->body : decl;
         if (jl_is_type_type(unw) && jl_is_type(a)) {
             jl_value_t *tp0 = jl_tparam0(unw);
-            if (tp0 == (jl_value_t*)jl_typetype_tvar) {
-                // in the case of Type{T}, the types don't have
-                // to match exactly either. this is cached as Type{T}.
-                // analogous to the situation with tuples.
-            }
-            else if (jl_is_typevar(tp0)) {
-                if (!jl_subtype(a, ((jl_tvar_t*)tp0)->ub))
+            if (jl_is_typevar(tp0)) {
+                // in the case of Type{_}, the types don't have to match exactly.
+                // this is cached as `Type{T} where T`.
+                if (((jl_tvar_t*)tp0)->ub != (jl_value_t*)jl_any_type &&
+                    !jl_subtype(a, ((jl_tvar_t*)tp0)->ub))
                     return 0;
             }
             else {
