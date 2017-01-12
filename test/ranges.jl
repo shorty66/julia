@@ -365,6 +365,7 @@ end
 
 # linspace with very large endpoints
 for T = (Float32, Float64)
+    largeint = Int(min(maxintfloat(T), typemax(Int)))
     a = realmax()
     for i = 1:5
         @test [linspace(a,a,1);] == [a]
@@ -377,17 +378,15 @@ for T = (Float32, Float64)
             @test [linspace(a,-b,0);] == []
             @test [linspace(a,-b,2);] == [a,-b]
             @test [linspace(a,-b,3);] == [a,(a-b)/2,-b]
-            for c = maxintfloat(T)-3:maxintfloat(T)
+            for c = largeint-3:largeint
                 s = linspace(-a,b,c)
                 @test first(s) == -a
                 @test last(s) == b
-                c <= typemax(Int) && @test length(s) == c
-                @test s.len == c
+                @test length(s) == c
                 s = linspace(a,-b,c)
                 @test first(s) == a
                 @test last(s) == -b
-                c <= typemax(Int) && @test length(s) == c
-                @test s.len == c
+                @test length(s) == c
             end
             b = prevfloat(b)
         end
