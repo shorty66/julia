@@ -19,9 +19,9 @@
 @test length(1:0) == 0
 @test length(0.0:-0.5) == 0
 @test length(1:2:0) == 0
-L32 = linspace(Int32(1), Int32(4), 4)
-L64 = linspace(Int64(1), Int64(4), 4)
-@test @inferred(L32[1]) == 1 && @inferred(L64[1]) == 1
+L32 = @inferred(linspace(Int32(1), Int32(4), 4))
+L64 = @inferred(linspace(Int64(1), Int64(4), 4))
+@test @inferred(L32[1]) === 1.0 && @inferred(L64[1]) === 1.0
 @test L32[2] == 2 && L64[2] == 2
 @test L32[3] == 3 && L64[3] == 3
 @test L32[4] == 4 && L64[4] == 4
@@ -38,20 +38,16 @@ r = 5:-1:1
 @test length(1.1:1.3:3) == 2
 @test length(1:1:1.8) == 1
 
-@test @inferred((0.1:0.1:0.3)[2]) == 0.2
-@test @inferred((0.1f0:0.1f0:0.3f0)[2]) == 0.2f0
+@test @inferred((0.1:0.1:0.3)[2]) === 0.2
+@test @inferred((0.1f0:0.1f0:0.3f0)[2]) === 0.2f0
 
-@test @inferred((1:5)[1:4]) == 1:4
-@test @inferred((1.0:5)[1:4]) == 1.0:4
+@test @inferred((1:5)[1:4]) === 1:4
+@test @inferred((1.0:5)[1:4]) === 1.0:4
 @test (2:6)[1:4] == 2:5
-@test (1:6)[2:5] == 2:5
-@test typeof((1:6)[2:5]) == typeof(2:5)
-@test (1:6)[2:2:5] == 2:2:4
-@test typeof((1:6)[2:2:5]) == typeof(2:2:4)
-@test (1:2:13)[2:6] == 3:2:11
-@test typeof((1:2:13)[2:6]) == typeof(3:2:11)
-@test (1:2:13)[2:3:7] == 3:6:13
-@test typeof((1:2:13)[2:3:7]) == typeof(3:6:13)
+@test (1:6)[2:5] === 2:5
+@test (1:6)[2:2:5] === 2:2:4
+@test (1:2:13)[2:6] === 3:2:11
+@test (1:2:13)[2:3:7] === 3:6:13
 
 @test isempty((1:4)[5:4])
 @test_throws BoundsError (1:10)[8:-1:-2]

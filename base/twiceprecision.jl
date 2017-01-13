@@ -326,7 +326,7 @@ function linspace{T<:Union{Float16,Float32,Float64}}(start::T, stop::T, len::Int
     _linspace(start, stop, len)
 end
 
-function _linspace{T<:Union{Float16,Float32,Float64}}(start::T, stop::T, len)
+function _linspace{T<:Union{Float16,Float32,Float64}}(start::T, stop::T, len::Integer)
     (isfinite(start) && isfinite(stop)) || throw(ArgumentError("start and stop must be finite, got $start and $stop"))
     # Find the index that returns the smallest-magnitude element
     Δ, Δfac = stop-start, 1
@@ -391,7 +391,7 @@ function linspace{T}(::Type{T}, start_n::Integer, stop_n::Integer, len::Integer,
 end
 
 # For len < 2
-function _linspace1{T}(::Type{T}, start, stop, len)
+function _linspace1{T}(::Type{T}, start, stop, len::Integer)
     len >= 0 || throw(ArgumentError("linspace($start, $stop, $len): negative length"))
     if len <= 1
         len == 1 && (start == stop || throw(ArgumentError("linspace($start, $stop, $len): endpoints differ")))
