@@ -479,7 +479,7 @@ by that name does not exist. Let us explore some of the possible causes.
 
 ```julia
 julia> module Foo
-         foo() = remotecall_fetch(x->x, 2, "Hello")
+           foo() = remotecall_fetch(x->x, 2, "Hello")
        end
 
 julia> Foo.foo()

@@ -1120,12 +1120,13 @@ remotecall_fetch(()->eval(:(f16091b = () -> 2)), wid)
 let
     f16091c = () -> 1
     @test remotecall_fetch(f16091c, 2) === 1
-    @test remotecall_fetch((myid)-> begin
-        let
-            f16091c = () -> 2
-            remotecall_fetch(f16091c, myid)
-        end
-    end, wid, myid()) === 2
+    @test remotecall_fetch(
+        myid -> begin
+            let
+                f16091c = () -> 2
+                remotecall_fetch(f16091c, myid)
+            end
+        end, wid, myid()) === 2
 end
 
 # issue #16451
@@ -1288,7 +1289,7 @@ end
 # bitstypes
 global v1 = 1
 @test remotecall_fetch(()->v1, id_other) == v1
-@test remotecall_fetch(()->isdefined(Main, :v1), id_other) == true
+@test remotecall_fetch(()->isdefined(Main, :v1), id_other)
 for i in 2:5
     global v1 = i
     @test remotecall_fetch(()->v1, id_other) == i
@@ -1359,14 +1360,14 @@ v = rand()
 # consts
 const c1 = ones(10)
 @test remotecall_fetch(()->c1, id_other) == c1
-@test remotecall_fetch(()->isconst(Main, :c1), id_other) == true
+@test remotecall_fetch(()->isconst(Main, :c1), id_other)
 
 # Test same calls with local vars
 function wrapped_var_ser_tests()
     # bitstypes
     local lv1 = 1
     @test remotecall_fetch(()->lv1, id_other) == lv1
-    @test remotecall_fetch(()->isdefined(Main, :lv1), id_other) == false
+    @test !remotecall_fetch(()->isdefined(Main, :lv1), id_other)
     for i in 2:5
         lv1 = i
         @test remotecall_fetch(()->lv1, id_other) == i
@@ -1422,7 +1423,7 @@ end
 foreach(wait, refs)
 
 #14399
-s = convert(SharedArray, [1,2,3,4]);
+s = convert(SharedArray, [1,2,3,4])
 @test pmap(i->length(s), 1:2) == [4,4]
 
 #6760

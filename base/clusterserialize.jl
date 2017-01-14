@@ -86,7 +86,7 @@ end
 # b) hash value has changed or
 # c) is a bitstype
 function syms_2b_sent(s::ClusterSerializer, identifier)
-    lst=Symbol[]
+    lst = Symbol[]
     check_syms = get(s.glbs_in_tnobj, identifier, [])
     for sym in check_syms
         v = getfield(Main, sym)
@@ -119,7 +119,11 @@ function serialize_global_from_main(s::ClusterSerializer, sym)
             finalizer(v, x->delete_global_tracker(s,x))
         catch ex
             # Do not track objects that cannot be finalized.
-            record_v = false
+            if isa(ex, ErrorException)
+                record_v = false
+            else
+                rethrow(ex)
+            end
         end
     end
     record_v && (s.glbs_sent[oid] = hash(v))
@@ -144,10 +148,9 @@ function delete_global_tracker(s::ClusterSerializer, v)
         delete!(s.glbs_sent, oid)
     end
 
-    # TODO: If a global binding is released and gc'ed, should we release
-    # it on the remote node too? Would need to record the local object_id remotely,
-    # and then free it only if object_id matches the recorded it. Else, it could
-    # be pointing to new valid data.
+    # TODO: A global binding is released and gc'ed here but it continues
+    # to occupy memory on the remote node. Would be nice to release memory
+    # if possible.
 end
 
 function cleanup_tname_glbs(s::ClusterSerializer, identifier)
