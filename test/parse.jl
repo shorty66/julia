@@ -901,3 +901,8 @@ let
 end
 @test c8925 == 3 && isconst(:c8925)
 @test d8925 == 4 && isconst(:d8925)
+
+# Check that the body of a `where`-qualified short form function definition gets
+# a :block for its body
+short_where_call = :(f(x::T) where T = T)
+@test short_where_call.args[2].head == :block
