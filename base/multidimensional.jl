@@ -166,12 +166,12 @@ end  # IteratorsMD
 using .IteratorsMD
 
 ## Bounds-checking with CartesianIndex
-@inline checkbounds_indices(::Type{Bool}, ::Tuple{}, I::Tuple{CartesianIndex,Vararg{Any}}) =
-    checkbounds_indices(Bool, (), (I[1].I..., tail(I)...))
-@inline checkbounds_indices(::Type{Bool}, IA::Tuple{Any}, I::Tuple{CartesianIndex,Vararg{Any}}) =
-    checkbounds_indices(Bool, IA, (I[1].I..., tail(I)...))
-@inline checkbounds_indices(::Type{Bool}, IA::Tuple, I::Tuple{CartesianIndex,Vararg{Any}}) =
-    checkbounds_indices(Bool, IA, (I[1].I..., tail(I)...))
+@inline checkbounds_indices(::Type{Bool}, A::AbstractArray, ::Tuple{}, I::Tuple{CartesianIndex,Vararg{Any}}) =
+    checkbounds_indices(Bool, A, (), (I[1].I..., tail(I)...))
+@inline checkbounds_indices(::Type{Bool}, A::AbstractArray, IA::Tuple{Any}, I::Tuple{CartesianIndex,Vararg{Any}}) =
+    checkbounds_indices(Bool, A, IA, (I[1].I..., tail(I)...))
+@inline checkbounds_indices(::Type{Bool}, A::AbstractArray, IA::Tuple, I::Tuple{CartesianIndex,Vararg{Any}}) =
+    checkbounds_indices(Bool, A, IA, (I[1].I..., tail(I)...))
 
 # Indexing into Array with mixtures of Integers and CartesianIndices is
 # extremely performance-sensitive. While the abstract fallbacks support this,
@@ -184,24 +184,24 @@ using .IteratorsMD
 # Support indexing with an array of CartesianIndex{N}s
 # Here we try to consume N of the indices (if there are that many available)
 # The first two simply handle ambiguities
-@inline function checkbounds_indices{N}(::Type{Bool}, ::Tuple{}, I::Tuple{AbstractArray{CartesianIndex{N}},Vararg{Any}})
-    checkindex(Bool, (), I[1]) & checkbounds_indices(Bool, (), tail(I))
+@inline function checkbounds_indices{N}(::Type{Bool}, A::AbstractArray, ::Tuple{}, I::Tuple{AbstractArray{CartesianIndex{N}},Vararg{Any}})
+    checkindex(Bool, A, (), I[1]) & checkbounds_indices(Bool, A, (), tail(I))
 end
-@inline function checkbounds_indices(::Type{Bool}, IA::Tuple{Any}, I::Tuple{AbstractArray{CartesianIndex{0}},Vararg{Any}})
-    checkbounds_indices(Bool, IA, tail(I))
+@inline function checkbounds_indices(::Type{Bool}, A::AbstractArray, IA::Tuple{Any}, I::Tuple{AbstractArray{CartesianIndex{0}},Vararg{Any}})
+    checkbounds_indices(Bool, A, IA, tail(I))
 end
-@inline function checkbounds_indices{N}(::Type{Bool}, IA::Tuple{Any}, I::Tuple{AbstractArray{CartesianIndex{N}},Vararg{Any}})
-    checkindex(Bool, IA, I[1]) & checkbounds_indices(Bool, (), tail(I))
+@inline function checkbounds_indices{N}(::Type{Bool}, A::AbstractArray, IA::Tuple{Any}, I::Tuple{AbstractArray{CartesianIndex{N}},Vararg{Any}})
+    checkindex(Bool, A, IA, I[1]) & checkbounds_indices(Bool, A, (), tail(I))
 end
-@inline function checkbounds_indices{N}(::Type{Bool}, IA::Tuple, I::Tuple{AbstractArray{CartesianIndex{N}},Vararg{Any}})
+@inline function checkbounds_indices{N}(::Type{Bool}, A::AbstractArray, IA::Tuple, I::Tuple{AbstractArray{CartesianIndex{N}},Vararg{Any}})
     IA1, IArest = IteratorsMD.split(IA, Val{N})
-    checkindex(Bool, IA1, I[1]) & checkbounds_indices(Bool, IArest, tail(I))
+    checkindex(Bool, A, IA1, I[1]) & checkbounds_indices(Bool, A, IArest, tail(I))
 end
 
-function checkindex{N}(::Type{Bool}, inds::Tuple, I::AbstractArray{CartesianIndex{N}})
+function checkindex{N}(::Type{Bool}, A::AbstractArray, inds::Tuple, I::AbstractArray{CartesianIndex{N}})
     b = true
     for i in I
-        b &= checkbounds_indices(Bool, inds, (i,))
+        b &= checkbounds_indices(Bool, A, inds, (i,))
     end
     b
 end

@@ -1745,6 +1745,11 @@ end
 export @test_approx_eq
 # END code from base/test.jl
 
+# Deprecate partial linear indexing
+function partial_linear_indexing_warning(n)
+    depwarn("Partial linear indexing is deprecated. Use `reshape(A, Val{$n})` to make the dimensionality of the array match the number of indices.", (:getindex, :setindex!, :view))
+end
+
 # Deprecate Array(T, dims...) in favor of proper type constructors
 @deprecate Array{T,N}(::Type{T}, d::NTuple{N,Int})               Array{T,N}(d)
 @deprecate Array{T}(::Type{T}, d::Int...)                        Array{T,length(d)}(d...)

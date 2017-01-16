@@ -16,10 +16,10 @@ A = rand(5,4,3)
 @test checkbounds(Bool, A, 2, 2, 2, 1) == true  # extra indices
 @test checkbounds(Bool, A, 2, 2, 2, 2) == false
 @test checkbounds(Bool, A, 1, 1)  == true       # partial linear indexing (PLI)
-@test checkbounds(Bool, A, 1, 12) == true       # PLI
-@test checkbounds(Bool, A, 5, 12) == true       # PLI
+# @test checkbounds(Bool, A, 1, 12) == true       # PLI
+# @test checkbounds(Bool, A, 5, 12) == true       # PLI
 @test checkbounds(Bool, A, 1, 13) == false      # PLI
-@test checkbounds(Bool, A, 6, 12) == false      # PLI
+# @test checkbounds(Bool, A, 6, 12) == false      # PLI
 
 # single CartesianIndex
 @test checkbounds(Bool, A, CartesianIndex((1, 1, 1))) == true
@@ -36,8 +36,8 @@ A = rand(5,4,3)
 @test checkbounds(Bool, A, CartesianIndex((2, 2, 2, 1,))) == true
 @test checkbounds(Bool, A, CartesianIndex((2, 2, 2, 2,))) == false
 @test checkbounds(Bool, A, CartesianIndex((1, 1,)))  == true
-@test checkbounds(Bool, A, CartesianIndex((1, 12,))) == true
-@test checkbounds(Bool, A, CartesianIndex((5, 12,))) == true
+# @test checkbounds(Bool, A, CartesianIndex((1, 12,))) == true
+# @test checkbounds(Bool, A, CartesianIndex((5, 12,))) == true
 @test checkbounds(Bool, A, CartesianIndex((1, 13,))) == false
 @test checkbounds(Bool, A, CartesianIndex((6, 12,))) == false
 
@@ -63,7 +63,8 @@ A = rand(5,4,3)
 @test checkbounds(Bool, A, 1:61) == false
 @test checkbounds(Bool, A, 2, 2, 2, 1:1) == true  # extra indices
 @test checkbounds(Bool, A, 2, 2, 2, 1:2) == false
-@test checkbounds(Bool, A, 1:5, 1:12) == true
+@test checkbounds(Bool, A, 1:5, 1:4) == true
+# @test checkbounds(Bool, A, 1:5, 1:12) == true
 @test checkbounds(Bool, A, 1:5, 1:13) == false
 @test checkbounds(Bool, A, 1:6, 1:12) == false
 
@@ -76,7 +77,7 @@ A = rand(5,4,3)
 @test checkbounds(Bool, A, trues(61)) == false
 @test checkbounds(Bool, A, 2, 2, 2, trues(1)) == true  # extra indices
 @test checkbounds(Bool, A, 2, 2, 2, trues(2)) == false
-@test checkbounds(Bool, A, trues(5), trues(12)) == true
+# @test checkbounds(Bool, A, trues(5), trues(12)) == true
 @test checkbounds(Bool, A, trues(5), trues(13)) == false
 @test checkbounds(Bool, A, trues(6), trues(12)) == false
 @test checkbounds(Bool, A, trues(5, 4, 3)) == true
@@ -236,7 +237,6 @@ Base.setindex!{T}(A::TSlow{T,4}, v, i1::Int, i2::Int, i3::Int, i4::Int) =
 Base.setindex!{T}(A::TSlow{T,5}, v, i1::Int, i2::Int, i3::Int, i4::Int, i5::Int) =
     (A.data[(i1,i2,i3,i4,i5)] = v)
 
-import Base: trailingsize
 const can_inline = Base.JLOptions().can_inline != 0
 function test_scalar_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
     N = prod(shape)
@@ -245,7 +245,7 @@ function test_scalar_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
     @test A == B
     # Test indexing up to 5 dimensions
     i=0
-    for i5 = 1:trailingsize(B, 5)
+    for i5 = 1:size(B, 5)
         for i4 = 1:size(B, 4)
             for i3 = 1:size(B, 3)
                 for i2 = 1:size(B, 2)
@@ -266,7 +266,7 @@ function test_scalar_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
         @test A[i1] == B[i1] == i
     end
     i=0
-    for i2 = 1:trailingsize(B, 2)
+    for i2 = 1:size(B, 2)
         for i1 = 1:size(B, 1)
             i += 1
             @test A[i1,i2] == B[i1,i2] == i
@@ -274,7 +274,7 @@ function test_scalar_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
     end
     @test A == B
     i=0
-    for i3 = 1:trailingsize(B, 3)
+    for i3 = 1:size(B, 3)
         for i2 = 1:size(B, 2)
             for i1 = 1:size(B, 1)
                 i += 1
@@ -290,7 +290,7 @@ function test_scalar_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
     D2 = T(Int, shape)
     D3 = T(Int, shape)
     i=0
-    for i5 = 1:trailingsize(B, 5)
+    for i5 = 1:size(B, 5)
         for i4 = 1:size(B, 4)
             for i3 = 1:size(B, 3)
                 for i2 = 1:size(B, 2)
@@ -322,7 +322,7 @@ function test_scalar_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
     @test C == B == A
     C = T(Int, shape)
     i=0
-    for i2 = 1:trailingsize(C, 2)
+    for i2 = 1:size(C, 2)
         for i1 = 1:size(C, 1)
             i += 1
             C[i1,i2] = i
@@ -331,7 +331,7 @@ function test_scalar_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
     @test C == B == A
     C = T(Int, shape)
     i=0
-    for i3 = 1:trailingsize(C, 3)
+    for i3 = 1:size(C, 3)
         for i2 = 1:size(C, 2)
             for i1 = 1:size(C, 1)
                 i += 1
@@ -355,29 +355,29 @@ function test_vector_indexing{T}(::Type{T}, shape, ::Type{TestAbstractArray})
     @test B[vec(idxs)] == A[vec(idxs)] == vec(idxs)
     @test B[:] == A[:] == collect(1:N)
     @test B[1:end] == A[1:end] == collect(1:N)
-    @test B[:,:] == A[:,:] == reshape(1:N, shape[1], prod(shape[2:end]))
-    @test B[1:end,1:end] == A[1:end,1:end] == reshape(1:N, shape[1], prod(shape[2:end]))
+    # @test B[:,:] == A[:,:] == reshape(1:N, shape[1], prod(shape[2:end]))
+    # @test B[1:end,1:end] == A[1:end,1:end] == reshape(1:N, shape[1], prod(shape[2:end]))
     # Test with containers that aren't Int[]
     @test B[[]] == A[[]] == []
     @test B[convert(Array{Any}, idxs)] == A[convert(Array{Any}, idxs)] == idxs
 
     # Test adding dimensions with matrices
     idx1 = rand(1:size(A, 1), 3)
-    idx2 = rand(1:Base.trailingsize(A, 2), 4, 5)
+    idx2 = rand(1:size(A, 2), 4, 5)
     @test B[idx1, idx2] == A[idx1, idx2] == reshape(A[idx1, vec(idx2)], 3, 4, 5) == reshape(B[idx1, vec(idx2)], 3, 4, 5)
     @test B[1, idx2] == A[1, idx2] == reshape(A[1, vec(idx2)], 4, 5) == reshape(B[1, vec(idx2)], 4, 5)
 
     # test removing dimensions with 0-d arrays
     idx0 = reshape([rand(1:size(A, 1))])
     @test B[idx0, idx2] == A[idx0, idx2] == reshape(A[idx0[], vec(idx2)], 4, 5) == reshape(B[idx0[], vec(idx2)], 4, 5)
-    @test B[reshape([end]), reshape([end])] == A[reshape([end]), reshape([end])] == reshape([A[end,end]]) == reshape([B[end,end]])
+    # @test B[reshape([end]), reshape([end])] == A[reshape([end]), reshape([end])] == reshape([A[end,end]]) == reshape([B[end,end]])
 
     # test logical indexing
     mask = bitrand(shape)
     @test B[mask] == A[mask] == B[find(mask)] == A[find(mask)] == find(mask)
     @test B[vec(mask)] == A[vec(mask)] == find(mask)
     mask1 = bitrand(size(A, 1))
-    mask2 = bitrand(Base.trailingsize(A, 2))
+    mask2 = bitrand(size(A, 2))
     @test B[mask1, mask2] == A[mask1, mask2] == B[find(mask1), find(mask2)]
     @test B[mask1, 1] == A[mask1, 1] == find(mask1)
 end

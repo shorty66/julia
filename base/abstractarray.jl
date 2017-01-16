@@ -304,7 +304,7 @@ See also [`checkindex`](@ref).
 """
 function checkbounds(::Type{Bool}, A::AbstractArray, I...)
     @_inline_meta
-    checkbounds_indices(Bool, indices(A), I)
+    checkbounds_indices(Bool, A, indices(A), I)
 end
 # As a special extension, allow using logical arrays that match the source array exactly
 function checkbounds{_,N}(::Type{Bool}, A::AbstractArray{_,N}, I::AbstractArray{Bool,N})
@@ -325,15 +325,15 @@ end
 checkbounds(A::AbstractArray) = checkbounds(A, 1) # 0-d case
 
 """
-    checkbounds_indices(Bool, IA, I)
+    checkbounds_indices(Bool, A, IA, I)
 
 Return `true` if the "requested" indices in the tuple `I` fall within
 the bounds of the "permitted" indices specified by the tuple
 `IA`. This function recursively consumes elements of these tuples,
 usually in a 1-for-1 fashion,
 
-    checkbounds_indices(Bool, (IA1, IA...), (I1, I...)) = checkindex(Bool, IA1, I1) &
-                                                          checkbounds_indices(Bool, IA, I)
+    checkbounds_indices(Bool, A, (IA1, IA...), (I1, I...)) = checkindex(Bool, IA1, I1) &
+                                                             checkbounds_indices(Bool, A, IA, I)
 
 Note that [`checkindex`](@ref) is being used to perform the actual
 bounds-check for a single dimension of the array.
@@ -342,25 +342,43 @@ There are two important exceptions to the 1-1 rule: linear indexing and
 CartesianIndex{N}, both of which may "consume" more than one element
 of `IA`.
 """
-function checkbounds_indices(::Type{Bool}, IA::Tuple, I::Tuple)
+function checkbounds_indices(::Type{Bool}, A::AbstractArray, IA::Tuple, I::Tuple)
     @_inline_meta
-    checkindex(Bool, IA[1], I[1]) & checkbounds_indices(Bool, tail(IA), tail(I))
+    checkindex(Bool, IA[1], I[1]) & checkbounds_indices(Bool, A, tail(IA), tail(I))
 end
-checkbounds_indices(::Type{Bool}, ::Tuple{},  ::Tuple{})    = true
-checkbounds_indices(::Type{Bool}, ::Tuple{}, I::Tuple{Any}) = (@_inline_meta; checkindex(Bool, 1:1, I[1]))
-function checkbounds_indices(::Type{Bool}, ::Tuple{}, I::Tuple)
+checkbounds_indices(::Type{Bool}, ::AbstractArray, ::Tuple{},  ::Tuple{})    = true
+checkbounds_indices(::Type{Bool}, ::AbstractArray, ::Tuple{}, I::Tuple{Any}) = (@_inline_meta; checkindex(Bool, 1:1, I[1]))
+function checkbounds_indices(::Type{Bool}, A::AbstractArray, ::Tuple{}, I::Tuple)
     @_inline_meta
-    checkindex(Bool, 1:1, I[1]) & checkbounds_indices(Bool, (), tail(I))
+    checkindex(Bool, 1:1, I[1]) & checkbounds_indices(Bool, A, (), tail(I))
 end
-function checkbounds_indices(::Type{Bool}, IA::Tuple{Any}, I::Tuple{Any})
+function checkbounds_indices(::Type{Bool}, A::AbstractArray, IA::Tuple{Any}, I::Tuple{Any})
     @_inline_meta
     checkindex(Bool, IA[1], I[1])
 end
-function checkbounds_indices(::Type{Bool}, IA::Tuple, I::Tuple{Any})
+function checkbounds_indices(::Type{Bool}, A::AbstractArray, IA::Tuple, I::Tuple{Any})
     @_inline_meta
-    checkindex(Bool, OneTo(trailingsize(IA)), I[1])  # linear indexing
+    checkbounds_linear_indices(Bool, A, IA, I[1])
 end
-checkbounds_indices(::Type{Bool}, ::Tuple, ::Tuple{}) = true
+function checkbounds_linear_indices{T,N}(::Type{Bool}, A::AbstractArray{T,N}, ::NTuple{N}, i)
+    @_inline_meta
+    checkindex(Bool, linearindices(A), i) # linear indexing
+end
+function checkbounds_linear_indices(::Type{Bool}, A::AbstractArray, IA::Tuple, i)
+    @_inline_meta
+    if checkindex(Bool, IA[1], i)
+        return true
+    elseif checkindex(Bool, OneTo(trailingsize(IA)), i)  # partial linear indexing
+        partial_linear_indexing_warning(ndims(A) - length(IA) + 1)
+        return true # TODO: Return false after the above function is removed in deprecated.jl
+    end
+    return false
+end
+function checkbounds_linear_indices(::Type{Bool}, A::AbstractArray, IA::Tuple, i::Union{Slice,Colon})
+    partial_linear_indexing_warning(ndims(A) - length(IA) + 1)
+    true
+end
+checkbounds_indices(::Type{Bool}, ::AbstractArray, ::Tuple, ::Tuple{}) = true
 
 throw_boundserror(A, I) = (@_noinline_meta; throw(BoundsError(A, I)))
 
