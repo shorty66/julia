@@ -484,3 +484,9 @@ test_fast_le(a, b) = @fastmath a <= b
 @inferred test_fast_ne(1.0, 1.0)
 @inferred test_fast_lt(1.0, 1.0)
 @inferred test_fast_le(1.0, 1.0)
+
+# Issue 20067
+@generated function foo20067{T <: Tuple}(::Type{T}, elements::Tuple)
+           :(T)
+end
+code_typed(DevNull, foo20067, (DataType, Tuple{Int, Int}))
