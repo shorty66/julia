@@ -123,14 +123,12 @@ chomp!(s::AbstractString) = chomp(s) # copying fallback for other string types
 
 const _default_delims = [' ','\t','\n','\v','\f','\r']
 
-"""
-    lstrip(s::AbstractString[, chars::Chars])
+doc"""
+    lstrip(s::AbstractString, chars::Chars=$(_default_delims))
 
 Return `s` with any leading whitespace and delimiters removed.
-The default delimiters to remove are `' '`, `\\t`, `\\n`, `\\v`,
-`\\f`, and `\\r`.
-If `chars` (a character, or vector or set of characters) is provided,
-instead remove characters contained in it.
+If `chars` (a character, or vector or set of characters) is provided, 
+remove characters contained in it.
 
 # Examples
 ```jldoctest
@@ -154,14 +152,12 @@ function lstrip(s::AbstractString, chars::Chars=_default_delims)
     SubString(s, e+1, e)
 end
 
-"""
-    rstrip(s::AbstractString[, chars::Chars])
+doc"""
+    rstrip(s::AbstractString, chars::Chars=$(_default_delims))
 
 Return `s` with any trailing whitespace and delimiters removed.
-The default delimiters to remove are `' '`, `\\t`, `\\n`, `\\v`,
-`\\f`, and `\\r`.
 If `chars` (a character, or vector or set of characters) is provided,
-instead remove characters contained in it.
+remove characters contained in it.
 
 # Examples
 ```jldoctest
@@ -185,12 +181,12 @@ function rstrip(s::AbstractString, chars::Chars=_default_delims)
     SubString(s, 1, 0)
 end
 
-"""
-    strip(s::AbstractString, [chars::Chars])
+doc"""
+    strip(s::AbstractString, chars::Chars=$(_default_delims))
 
 Return `s` with any leading and trailing whitespace removed.
 If `chars` (a character, or vector or set of characters) is provided,
-instead remove characters contained in it.
+remove characters contained in it.
 
 # Examples
 ```jldoctest
@@ -262,8 +258,8 @@ rpad(s, n::Integer, p=" ") = rpad(string(s),n,string(p))
 split(str::T, splitter; limit::Integer=0, keep::Bool=true) where {T<:SubString} =
     _split(str, splitter, limit, keep, T[])
 
-"""
-    split(s::AbstractString, [chars]; limit::Integer=0, keep::Bool=true)
+doc"""
+    split(s::AbstractString, chars::Chars=$(_default_delims); limit::Integer=0, keep::Bool=true)
 
 Return an array of substrings by splitting the given string on occurrences of the given
 character delimiters, which may be specified in any of the formats allowed by `search`'s
@@ -314,8 +310,8 @@ split(str::AbstractString) = split(str, _default_delims; limit=0, keep=false)
 rsplit(str::T, splitter; limit::Integer=0, keep::Bool=true) where {T<:SubString} =
     _rsplit(str, splitter, limit, keep, T[])
 
-"""
-    rsplit(s::AbstractString, [chars]; limit::Integer=0, keep::Bool=true)
+doc"""
+    rsplit(s::AbstractString, chars::Chars=$(_default_delims); limit::Integer=0, keep::Bool=true)
 
 Similar to [`split`](@ref), but starting from the end of the string.
 
