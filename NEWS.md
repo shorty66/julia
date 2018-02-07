@@ -197,6 +197,8 @@ Language changes
 
   * Underscores for `_italics_` and `__bold__` are now supported by the Base Markdown
     parser. ([#25564])
+    
+  * Strings representing floating point numbers can now be parsed in bases 2 to 23 ([22596]).
 
 Breaking changes
 ----------------
@@ -1019,9 +1021,6 @@ Deprecated or removed
 
   * `DateTime()`, `Date()`, and `Time()` have been deprecated, instead use `DateTime(1)`, `Date(1)`
     and `Time(0)` respectively ([#23724]).
-
-  * The fallback method `^(x, p::Integer)` is deprecated. If your type relied on this definition,
-    add a method such as `^(x::MyType, p::Integer) = Base.power_by_squaring(x, p)` ([#23332]).
 
 Command-line option changes
 ---------------------------
