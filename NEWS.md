@@ -197,6 +197,8 @@ Language changes
 
   * Underscores for `_italics_` and `__bold__` are now supported by the Base Markdown
     parser. ([#25564])
+    
+  * Strings representing floating point numbers can now be parsed in bases 2 to 23 ([22596]).
 
 Breaking changes
 ----------------
