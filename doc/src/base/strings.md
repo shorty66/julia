@@ -24,6 +24,7 @@ Base.@r_str
 Base.SubstitutionString
 Base.@s_str
 Base.@raw_str
+Base.Regex
 Base.Docs.@html_str
 Base.Docs.@text_str
 Base.isvalid(::Any)
